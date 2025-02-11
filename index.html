@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAYURA CAFE</title>
+  <style>
+    .company-logo {
+        width: 1200px;
+        height: auto;
+    }
+</style>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="header">
+    <header style="display: flex; align-items: center; justify-content: center;">
+      <img src="https://media-hosting.imagekit.io//83ca69e893ab436b/mayura%20logo.png?Expires=1833687019&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=F71hKmW6ciLljVXN-WiinU~zaxXD42x6V4fuYccbdGp~D4lT~uJUEVJbiRbXQ0WeZ5bZkjs9DA0zZx3lOU5CuWqPsb5x-7LeqN0QMFnKJD2FwP8~BmFMDegiJog4q31N7wVDN926YQ0vktrLA5WxcnedFzhbhieMGsDDZQXtKGvJEylSRmVU~dEsPDVTzYGOAtOIPO7DNifXJlOFAoERn1dhovpBym-kcCxKQXO56hxZX1EWWrQZo~wE8KUG1xltId2NfqJLcBSnGGRY5ZB9ofRpT-AzER2ZUPkPqU6SUcMZcr0UVx58YY1b91oypO6ZCOCzJcPgb5NCzRN4-yTcWA__" alt="Mayura Cafe Logo" style="width: 100px; height: auto; margin-right: 10px;">
+      <h1 style="font-size: 60px; margin: 0;"><b>MAYURA CAFE</b></h1>
+    </header>
+    <h4 style="text-align: center; margin-top: 5px;"><b>HIGH CLASS VEG RESTAURANT</b></h4>
+  </div>
+  <div class="sales-dashboard">
+    <a href="dashboard.html">Go to Sales Dashboard</a>
+  </div>
+  <div class="menu-categories">
+    <button class="active" onclick="fetchMenuItems('')">All</button>
+    <button class="active" onclick="fetchMenuItems('Idli')">Idli</button>
+    <button class="active" onclick="fetchMenuItems('Dosai')">Dosa</button>
+    <button class="active" onclick="fetchMenuItems('Adai')">Adai</button>
+    <button class="active" onclick="fetchMenuItems('Uthappam')">Uthappam</button>
+    <button class="active" onclick="fetchMenuItems('Snacks')">Snacks</button>
+  </div>
+  
+
+  <div class="menu-items">
+    <!-- Menu items will be dynamically populated here -->
+  </div>
+
+  <div class="order-summary" id="orderSummary">
+    <div class="summary-box">
+      <h2>Order Summary</h2>
+      <ul id="orderList"></ul>
+      <p id="totalAmount">Total: ₹0.00</p>
+      <button onclick="placeOrder()">Place Order</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Fetch and populate menu items on page load
+    fetchMenuItems();
+  </script>
+</body>
+</html>

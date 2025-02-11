@@ -1,0 +1,95 @@
+.header {
+  background-color: #CAC7CE;
+  color: #151D3A;
+  padding: 12px;
+  text-align: center;
+  font-family: Tahoma, sans-serif;
+}
+
+.charts-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-box {
+  width: 45%;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+#pieChart {
+  max-width: 100%;
+  height: 50px; /* Reduced height for smaller pie chart */
+}
+
+#barChart {
+  max-width: 100%;
+  height: auto;
+}
+
+.filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  gap: 15px;
+}
+
+.filters label {
+  font-family: Tahoma, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.filters select {
+  font-family: Tahoma, sans-serif;
+  font-size: 14px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.filters select:hover {
+  border-color: #999;
+}
+
+.filters select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.8);
+}
+
+.filters button {
+  font-family: Tahoma, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.filters button:hover {
+  background-color: #218838;
+}
+
+.filters button:active {
+  background-color: #1e7e34;
+}

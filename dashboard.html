@@ -53,14 +53,15 @@
       <canvas id="pieChart" width="400" height="150"></canvas>
     </div>
   </div>
-
+<!-- 
   <script>
     async function fetchReport() {
       const year = document.getElementById('year').value;
       const month = document.getElementById('month').value;
 
       try {
-        const response = await fetch(`http://localhost:8080/api/foodOrders/report/${year}/${month}`);
+        // const response = await fetch(`http://localhost:8080/api/foodOrders/report/${year}/${month}`);
+        const response = await fetch(`${BASE_URL}/foodOrders/report/${year}/${month}`);
         const data = await response.json();
 
         const labels = data.map(item => item.itemName);
@@ -74,7 +75,7 @@
 
     async function fetchChartData() {
       try {
-        const response = await fetch('http://localhost:8080/api/stats'); 
+        const response = await fetch(`${BASE_URL}/stats`); 
         const jsonData = await response.json();
 
         // Extract labels and values for the bar chart
@@ -229,8 +230,10 @@
     function downloadReport() {
       const year = document.getElementById('year').value;
       const month = document.getElementById('month').value;
-      window.location.href = `http://localhost:8080/api/foodOrders/report/${year}/${month}/download`;
+      window.location.href = `${BASE_URL}/foodOrders/report/${year}/${month}/download`;
     }
-  </script>
+  </script> -->
+
+<script src="dashboard_script.js"></script>
 </body>
 </html>

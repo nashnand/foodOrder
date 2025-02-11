@@ -49,8 +49,23 @@
 
   <script src="script.js"></script>
   <script>
+    let baseUrl; // Declare the base URL globally
+
+// Fetch the base URL from config.json
+    fetch('config.json')
+    .then(response => response.json())
+    .then(config => {
+     baseUrl = config.baseUrl; // Set the base URL globally
+      console.log("Base URL:", baseUrl);
     // Fetch and populate menu items on page load
     fetchMenuItems();
+  })
+  .catch(error => {
+    console.error('Error loading config:', error);
+  });
+
   </script>
+
+
 </body>
 </html>

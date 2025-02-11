@@ -7,7 +7,7 @@ let total = 0;
 // Function to fetch menu items from the API
 async function fetchMenuItems(type = '') {
   try {
-    const url = type ? `http://localhost:8080/api/menu?type=${type}` : `http://localhost:8080/api/menu`;
+    const url = type ? `${baseUrl}/api/menu?type=${type}` : `${baseUrl}/api/menu`;
     const response = await fetch(url);
     const menuItems = await response.json();
 
@@ -74,24 +74,11 @@ function addToOrder(name, price) {
 }
 
 
-// Function to place the order
-// function placeOrder() {
-//   alert(`Order placed! Total amount: ₹${total.toFixed(2)}`);
-//   // Clear order summary
-//   orderList.innerHTML = '';
-//   total = 0;
-//   totalAmount.textContent = 'Total: ₹0.00';
-// }
-
 async function placeOrder() {
   const orderItems = [];
   const orderList = document.querySelectorAll("#orderList li");
 
-  // orderList.forEach((item) => {
-  //   const [name, price] = item.textContent.split(" - ₹");
-  //   orderItems.push({ name: name.trim(), price: parseFloat(price.trim()) });
-  // });
-   console.log(orderList);
+  console.log(orderList);
   orderList.forEach((item) => {
     
     const text = item.textContent.trim(); // Get the content and remove extra spaces
@@ -131,7 +118,7 @@ async function placeOrder() {
   };
  console.log(JSON.stringify(orderData));
     try {
-      const response = await fetch("http://localhost:8080/api/foodOrders", {
+      const response = await fetch(`${baseUrl}/api/foodOrders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),

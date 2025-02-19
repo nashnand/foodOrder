@@ -26,7 +26,15 @@ async function fetchMenuItems(type = '') {
     });
   } catch (error) {
     console.error('Error fetching menu items:', error);
+      // Display error in SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Failed to load menu items. Please try again later.',
+       // footer: `<p>Error Details: ${error.message}</p>` // Optional, remove if not needed
+      });  
     document.querySelector('.menu-items').innerHTML = '<p>Failed to load menu items. Please try again later.</p>';
+    
   }
 }
 
@@ -41,28 +49,29 @@ async function fetchMenuItems(type = '') {
 
 // Function to add an item to the order
 function addToOrder(name, price) {
-  const existingItem = Array.from(orderList.children).find(item => 
+  const existingItem = Array.from(orderList.children).find(item =>
     item.dataset.name === name
   );
 
   if (existingItem) {
     // Update quantity and total price for the existing item
-    const quantitySpan = existingItem.querySelector('.quantity');
+    const quantityInput = existingItem.querySelector('.quantity');
     const amountSpan = existingItem.querySelector('.amount');
 
-    const quantity = parseInt(quantitySpan.textContent, 10) + 1;
-    quantitySpan.textContent = quantity;
+    // Increment the quantity
+    quantityInput.value = parseInt(quantityInput.value, 10) + 1;
 
-    const newAmount = quantity * price;
+    // Update the total price for this item
+    const newAmount = quantityInput.value * price;
     amountSpan.textContent = `₹${newAmount.toFixed(2)}`;
   } else {
-    // Add new item to the list
+    // Add a new item to the list
     const listItem = document.createElement('li');
     listItem.dataset.name = name;
 
     listItem.innerHTML = `
       ${name} - 
-      <span class="quantity">1</span> x ₹${price.toFixed(2)} = 
+      <input class="quantity" type="number" value="1" min="1" style="width: 40px; text-align: center;" onchange="updateItemTotal(this, ${price})"> x ₹${price.toFixed(2)} = 
       <span class="amount">₹${price.toFixed(2)}</span>
     `;
     orderList.appendChild(listItem);
@@ -73,66 +82,132 @@ function addToOrder(name, price) {
   totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
 }
 
+// Function to update item total and overall total when quantity changes
+function updateItemTotal(input, price) {
+  const quantity = parseInt(input.value, 10);
+  if (quantity < 1) {
+    alert("Quantity cannot be less than 1.");
+    input.value = 1;
+    return;
+  }
+
+  const listItem = input.closest('li');
+  const amountSpan = listItem.querySelector('.amount');
+
+  // Update the amount for the item
+  const newAmount = quantity * price;
+  amountSpan.textContent = `₹${newAmount.toFixed(2)}`;
+
+  // Recalculate the total amount
+  recalculateTotal();
+}
+
+// Function to recalculate the total amount
+function recalculateTotal() {
+  total = 0;
+  const items = orderList.querySelectorAll('li');
+  items.forEach(item => {
+    const amount = parseFloat(item.querySelector('.amount').textContent.replace('₹', ''));
+    total += amount;
+  });
+  totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
+}
 
 async function placeOrder() {
   const orderItems = [];
   const orderList = document.querySelectorAll("#orderList li");
 
-  console.log(orderList);
+  if (orderList.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'No items in the order!',
+      text: 'Please add items to place an order.',
+    });
+    return;
+  }
+
   orderList.forEach((item) => {
-    
-    const text = item.textContent.trim(); // Get the content and remove extra spaces
-    console.log(item.textContent.trim());
-    // Match name, quantity, and price using a regular expression
-    const match = text.match(/^(.*?) -\s*(\d+)\s*x\s*₹(\d+(\.\d{1,2})?)\s*=\s*₹(\d+(\.\d{1,2})?)$/);
-  
-    if (match) {
-      const name = match[1].trim();
-      const quantity = match[2];  // Extract quantity
-      const unitPrice = parseFloat(match[3].trim()); // Extract unit price
-      const price = parseFloat(match[5].trim()); // Extract total price (optional)
-  
-      orderItems.push({
-        name,
-        quantity,
-        price
-      });
+    // Normalize text: Remove extra whitespace and newlines
+    const text = item.textContent.replace(/\s+/g, " ").trim();
+    console.log("Normalized Order List Item Text:", text); // Debugging log
+
+    // Split the string into parts
+    const parts = text.split(" - ");
+    if (parts.length === 2) {
+      const itemName = parts[0].trim(); // Item name
+      const details = parts[1].split("x ₹"); // Split to isolate price and total
+
+      if (details.length === 2) {
+        const unitPriceAndTotal = details[1].split("= ₹"); // Split to separate unit price and total
+        if (unitPriceAndTotal.length === 2) {
+          const unitPrice = parseFloat(unitPriceAndTotal[0].trim());
+          const totalPrice = parseFloat(unitPriceAndTotal[1].trim());
+          const quantity = Math.round(totalPrice / unitPrice); // Calculate quantity
+
+          // Add item to the list
+          orderItems.push({
+            name: itemName,
+            quantity,
+            price: unitPrice,
+          });
+        }
+      }
     } else {
       console.warn(`Unexpected item format: ${text}`);
     }
   });
 
+  if (orderItems.length === 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Order Error',
+      text: 'Failed to parse order items. Please check the order details.',
+    });
+    return;
+  }
+
   const totalAmount = parseFloat(
     document.getElementById("totalAmount").textContent.replace("Total: ₹", "")
   );
-  // Check if orderItems is empty
-  if (orderItems.length === 0) {
-    alert("No items in the order. Please add items to place an order.");
-    return; // Stop execution
-  }
-  const orderId = Date.now().toString();
+
   const orderData = {
-    orderId: orderId,
+    orderId: Date.now().toString(),
     items: orderItems,
     totalAmount: totalAmount,
   };
- console.log(JSON.stringify(orderData));
-    try {
-      const response = await fetch(`${baseUrl}/api/foodOrders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-   
+
+  console.log("Order Data to Send:", JSON.stringify(orderData));
+
+  try {
+    const response = await fetch(`${baseUrl}/api/foodOrders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
+
     if (response.ok) {
-      alert("Order placed successfully!");
+      Swal.fire({
+        icon: 'success',
+        title: 'Order Placed Successfully!',
+        html: `<p>Order placed successfully!</p><p><strong>Order ID:</strong> ${orderData.orderId}</p>`,
+        confirmButtonText: 'OK',
+      });
       document.getElementById("orderList").innerHTML = "";
       document.getElementById("totalAmount").textContent = "Total: ₹0.00";
     } else {
-      alert("Failed to place the order. Please try again.");
+      const errorData = await response.json();
+      Swal.fire({
+        icon: 'error',
+        title: 'Order Failed',
+        text: errorData.message || 'Unknown error occurred.',
+      });
     }
   } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Order Error',
+      text: 'An error occurred. Please try again later.',
+    });
     console.error("Error placing order:", error);
-    alert("An error occurred. Please try again later.");
   }
 }

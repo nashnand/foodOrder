@@ -183,6 +183,3 @@ options: {
 }
 });
 }
-
-// Fetch and render chart data on page load
-// fetchChartData();

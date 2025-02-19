@@ -5,45 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sales Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="dashboard_styles.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="header">
+  <!-- <div class="header">
     <h1 style="font-size: 40px; margin: 0;">Sales Dashboard</h1>
     <div class="dashboard-link">
       <a style="text-align: center; margin-top: 5px;" href="index.html" class="dashboard-button">Back to Home</a>
     </div>
   </header>
-  </div>
-
-  <div class="filters">
-    <label for="year">Year:</label>
-    <select id="year">
-      <option value="2025">2025</option>
-      <option value="2024">2024</option>
-      <option value="2023">2023</option>
-    </select>
-
-    <label for="month">Month:</label>
-    <select id="month">
-      <option value="1">January</option>
-      <option value="2">February</option>
-      <option value="3">March</option>
-      <option value="4">April</option>
-      <option value="5">May</option>
-      <option value="6">June</option>
-      <option value="7">July</option>
-      <option value="8">August</option>
-      <option value="9">September</option>
-      <option value="10">October</option>
-      <option value="11">November</option>
-      <option value="12">December</option>
-    </select>
-
-    <!-- <button onclick="fetchReport()">Generate Report</button> -->
-  
-    <button onclick="downloadReport()">Download Report</button> 
-  </div>
+  </div> -->
+  <!-- Menu bar -->
+  <nav class="menu-bar">
+    <a href="index.html">
+      <span class="icon">🏠</span> Home
+    </a>
+    <a href="orderHistory.html">
+      <span class="icon">📜</span> Orders
+    </a>
+    <a href="dashboard.html" class="active">
+      <span class="icon">📊</span> Dashboards
+    </a>
+    <!-- <a href="account.html">
+      <span class="icon">👤</span> Account
+    </a> -->
+    <a href="menu.html">
+      <span class="icon">⚙️</span> Settings
+  </nav>
 
   <div class="charts-container">
     <div class="chart-box">
@@ -53,186 +42,6 @@
       <canvas id="pieChart" width="400" height="150"></canvas>
     </div>
   </div>
-<!-- 
-  <script>
-    async function fetchReport() {
-      const year = document.getElementById('year').value;
-      const month = document.getElementById('month').value;
-
-      try {
-        // const response = await fetch(`http://localhost:8080/api/foodOrders/report/${year}/${month}`);
-        const response = await fetch(`${BASE_URL}/foodOrders/report/${year}/${month}`);
-        const data = await response.json();
-
-        const labels = data.map(item => item.itemName);
-        const values = data.map(item => item.totalAmount);
-
-        renderCharts(labels, values);
-      } catch (error) {
-        console.error('Error fetching report:', error);
-      }
-    }
-
-    async function fetchChartData() {
-      try {
-        const response = await fetch(`${BASE_URL}/stats`); 
-        const jsonData = await response.json();
-
-        // Extract labels and values for the bar chart
-        const barLabels = jsonData.mostPopularItems.map(item => item.item);
-        const barValues = jsonData.mostPopularItems.map(item => item.total_sum);
-
-        // Extract values for the pie chart
-        const pieLabels = ['Average Order Value', 'Total Orders', 'Total Revenue'];
-        const pieValues = [jsonData.averageOrderValue, jsonData.totalOrders, jsonData.totalRevenue];
-
-        // Render the charts
-        renderBarChart(barLabels, barValues);
-        renderPieChart(pieLabels, pieValues);
-      } catch (error) {
-        console.error('Error fetching chart data:', error);
-      }
-    }
-    function renderBarChart(labels, values) {
-      const barCtx = document.getElementById('barChart').getContext('2d');
-      const gradient = barCtx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, 'rgba(54, 162, 235, 1)');
-      gradient.addColorStop(1, 'rgba(75, 192, 192, 0.5)');
-
-      new Chart(barCtx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Total Revenue',
-            data: values,
-            backgroundColor: gradient,
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1,
-            borderRadius: 5,
-            hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)'
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: true,
-              position: 'top',
-              labels: {
-                color: '#333',
-                font: {
-                  size: 14,
-                  weight: 'bold'
-                }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return `Revenue: ₹${context.raw}`;
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Revenue (₹)',
-                color: '#666',
-                font: {
-                  size: 12,
-                  weight: 'bold'
-                }
-              },
-              grid: {
-                color: 'rgba(200, 200, 200, 0.5)',
-                borderDash: [5, 5]
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Items',
-                color: '#666',
-                font: {
-                  size: 12,
-                  weight: 'bold'
-                }
-              },
-              grid: {
-                display: false
-              }
-            }
-          }
-        }
-      });
-    }
-    function renderPieChart(labels, values) {
-  const pieCtx = document.getElementById('pieChart').getContext('2d');
-  const gradient1 = pieCtx.createLinearGradient(0, 0, 0, 200);
-  gradient1.addColorStop(0, 'rgba(75, 192, 192, 1)');
-  gradient1.addColorStop(1, 'rgba(153, 102, 255, 1)');
-  
-  const gradient2 = pieCtx.createLinearGradient(0, 0, 0, 200);
-  gradient2.addColorStop(0, 'rgba(255, 159, 64, 1)');
-  gradient2.addColorStop(1, 'rgba(255, 99, 132, 1)');
-  
-  const gradient3 = pieCtx.createLinearGradient(0, 0, 0, 200);
-  gradient3.addColorStop(0, 'rgba(54, 162, 235, 1)');
-  gradient3.addColorStop(1, 'rgba(75, 192, 192, 1)');
-
-  new Chart(pieCtx, {
-    type: 'pie',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: values,
-        backgroundColor: [gradient1, gradient2, gradient3],
-        borderColor: 'rgba(255, 255, 255, 0.8)',
-        borderWidth: 2,
-        hoverOffset: 10,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            color: '#333',
-            font: {
-              size: 14,
-              weight: 'bold'
-            }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `${context.label}: ₹${context.raw}`;
-            }
-          }
-        }
-      },
-      layout: {
-        padding: 10
-      }
-    }
-  });
-}
-
-    // Fetch and render chart data on page load
-    fetchChartData();
-    function downloadReport() {
-      const year = document.getElementById('year').value;
-      const month = document.getElementById('month').value;
-      window.location.href = `${BASE_URL}/foodOrders/report/${year}/${month}/download`;
-    }
-  </script> -->
 
 <script src="dashboard_script.js"></script>
 </body>

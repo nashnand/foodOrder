@@ -4,26 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MAYURA CAFE</title>
-  <style>
-    .company-logo {
-        width: 1200px;
-        height: auto;
-    }
-</style>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
   <div class="header">
     <header style="display: flex; align-items: center; justify-content: center;">
-      <img src="https://media-hosting.imagekit.io//83ca69e893ab436b/mayura%20logo.png?Expires=1833687019&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=F71hKmW6ciLljVXN-WiinU~zaxXD42x6V4fuYccbdGp~D4lT~uJUEVJbiRbXQ0WeZ5bZkjs9DA0zZx3lOU5CuWqPsb5x-7LeqN0QMFnKJD2FwP8~BmFMDegiJog4q31N7wVDN926YQ0vktrLA5WxcnedFzhbhieMGsDDZQXtKGvJEylSRmVU~dEsPDVTzYGOAtOIPO7DNifXJlOFAoERn1dhovpBym-kcCxKQXO56hxZX1EWWrQZo~wE8KUG1xltId2NfqJLcBSnGGRY5ZB9ofRpT-AzER2ZUPkPqU6SUcMZcr0UVx58YY1b91oypO6ZCOCzJcPgb5NCzRN4-yTcWA__" alt="Mayura Cafe Logo" style="width: 100px; height: auto; margin-right: 10px;">
-      <h1 style="font-size: 60px; margin: 0;"><b>MAYURA CAFE</b></h1>
+      <img src="https://media-hosting.imagekit.io//6648ecd2ee9842fe/mayura_logo-removebg-preview.png?Expires=1833961433&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=BmUdOCgwz8-niv0busDGWVpa3vNQtYqaa1a2D33pTVFmX4JAeC62n61n-Qn7EQ2mOcHb5eW7jyZA9OvF-NA5-Tv0D9vCFA1AL0ja~PEl-B7JX7olRjuUNWeURIFtcygaJ34ULW-x9OArnQTou5VDlC8GAXeC82cYCw7x8ZoquYDE80uM-qEEI0tPepF1pzG4QZuunMiZuqU-ttGQGS4eU9Q1cpP4oB~xcVKPOMeE9QRxZ4-scCPoMwqPnRM5QYXV-gAKeQ7~ybhwiDkBDAyVtuvusXkYJqDF632ypwfzuqwrVvO7kHerJYwwqle4zb-akUXk~PtcqCgqoOQ7zHi4MA__" alt="Mayura Cafe Logo">
+      <h1><b>MAYURA CAFE</b></h1>
     </header>
     <h4 style="text-align: center; margin-top: 5px;"><b>HIGH CLASS VEG RESTAURANT</b></h4>
   </div>
-  <div class="sales-dashboard">
-    <a href="dashboard.html">Go to Sales Dashboard</a>
-  </div>
+
+  <!-- Menu bar -->
+  <nav class="menu-bar">
+    <a href="index.html" class="active">
+      <span class="icon">🏠</span> Home
+    </a>
+    <a href="orderHistory.html">
+      <span class="icon">📜</span> Orders
+    </a>
+    <a href="dashboard.html">
+      <span class="icon">📊</span> Dashboards
+    </a>
+    <!-- <a href="account.html">
+      <span class="icon">👤</span> Account
+    </a> -->
+    <a href="menu.html">
+      <span class="icon">⚙️</span> Settings
+    </a>
+  </nav>
+
   <div class="menu-categories">
     <button class="active" onclick="fetchMenuItems('')">All</button>
     <button class="active" onclick="fetchMenuItems('Idli')">Idli</button>
@@ -32,40 +42,48 @@
     <button class="active" onclick="fetchMenuItems('Uthappam')">Uthappam</button>
     <button class="active" onclick="fetchMenuItems('Snacks')">Snacks</button>
   </div>
-  
 
   <div class="menu-items">
     <!-- Menu items will be dynamically populated here -->
   </div>
 
-  <div class="order-summary" id="orderSummary">
+  <!-- <div class="order-summary" id="orderSummary">
     <div class="summary-box">
       <h2>Order Summary</h2>
       <ul id="orderList"></ul>
       <p id="totalAmount">Total: ₹0.00</p>
       <button onclick="placeOrder()">Place Order</button>
     </div>
+  </div> -->
+  <div class="order-summary" id="orderSummary">
+    <div class="summary-box">
+      <h2>Order Summary</h2>
+      <ul id="orderList">
+        <!-- Dynamically added items will appear here -->
+      </ul>
+      <p id="totalAmount">Total: ₹0.00</p>
+      <button onclick="placeOrder()">Place Order</button>
+    </div>
   </div>
 
+  <!-- SweetAlert2 lib -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script src="script.js"></script>
+
   <script>
-    let baseUrl; // Declare the base URL globally
+    let baseUrl;
 
-// Fetch the base URL from config.json
     fetch('config.json')
-    .then(response => response.json())
-    .then(config => {
-     baseUrl = config.baseUrl; // Set the base URL globally
-      console.log("Base URL:", baseUrl);
-    // Fetch and populate menu items on page load
-    fetchMenuItems();
-  })
-  .catch(error => {
-    console.error('Error loading config:', error);
-  });
-
+      .then(response => response.json())
+      .then(config => {
+        baseUrl = config.baseUrl;
+        console.log("Base URL:", baseUrl);
+        fetchMenuItems();
+      })
+      .catch(error => {
+        console.error('Error loading config:', error);
+      });
   </script>
-
-
 </body>
 </html>

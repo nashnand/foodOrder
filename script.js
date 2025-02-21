@@ -17,52 +17,97 @@ async function fetchMenuItems(type = '') {
       const menuItem = document.createElement('div');
       menuItem.classList.add('menu-item');
       menuItem.innerHTML = `
-        <img src="${item.imageUrl || 'default-image.jpg'}" alt="${item.itemName}">
-        <h3>${item.itemName}</h3>
-        <p class="price">₹${item.price.toFixed(2)}</p>
-        <button onclick="addToOrder('${item.itemName}', ${item.price})">Add</button>
-      `;
+      <img src="${item.imageUrl || 'default-image.jpg'}" alt="${item.itemName}">
+      <h3>${item.itemName}</h3>
+      <p class="price">₹${item.price.toFixed(2)}</p>
+      <div class="action-container">
+        <button class="add-button" onclick="initializeQuantity('${item.itemName}', ${item.price}, this)">Add</button>
+      </div>
+    `;
+
       menuItemsContainer.appendChild(menuItem);
     });
   } catch (error) {
     console.error('Error fetching menu items:', error);
-      // Display error in SweetAlert2
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Failed to load menu items. Please try again later.',
-       // footer: `<p>Error Details: ${error.message}</p>` // Optional, remove if not needed
-      });  
+    // Display error in SweetAlert2
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Failed to load menu items. Please try again later.',
+      // footer: `<p>Error Details: ${error.message}</p>` // Optional, remove if not needed
+    });
     document.querySelector('.menu-items').innerHTML = '<p>Failed to load menu items. Please try again later.</p>';
-    
+
+  }
+}
+
+// Function to initialize the quantity when "Add" button is clicked
+function initializeQuantity(name, price, button) {
+  const parentContainer = button.parentNode;
+
+  // Replace the "Add" button with quantity controls
+  parentContainer.innerHTML = `
+    <div class="quantity-container">
+      <button class="quantity-button" onclick="changeQuantity('${name}', -1, ${price}, this)">-</button>
+      <input type="number" class="quantity-input" value="1" min="1" onchange="updateCustomQuantity('${name}', ${price}, this)">
+      <button class="quantity-button" onclick="changeQuantity('${name}', 1, ${price}, this)">+</button>
+    </div>
+  `;
+
+  // Add the item to the order with initial quantity 1
+  addToOrder(name, 1, price);
+}
+
+// Function to change the quantity of an item
+function changeQuantity(name, change, price, button) {
+  const quantityInput = button.parentNode.querySelector('.quantity-input');
+  let currentQuantity = parseInt(quantityInput.value, 10);
+  currentQuantity += change;
+
+  if (currentQuantity <= 0) {
+    // Reset to "Add" button if quantity is less than 1
+    const parentContainer = button.parentNode.parentNode;
+    parentContainer.innerHTML = `<button class="add-button" onclick="initializeQuantity('${name}', ${price}, this)">Add</button>`;
+
+    // Remove the item from the order
+    removeFromOrder(name);
+  } else {
+    // Update the quantity and the order list
+    quantityInput.value = currentQuantity;
+    updateOrder(name, currentQuantity, price);
+  }
+}
+
+// Function to handle custom quantity input
+function updateCustomQuantity(name, price, input) {
+  let quantity = parseInt(input.value, 10);
+
+  if (isNaN(quantity) || quantity <= 0) {
+    // Reset to "Add" button if invalid quantity is entered
+    const parentContainer = input.parentNode.parentNode;
+    parentContainer.innerHTML = `<button class="add-button" onclick="initializeQuantity('${name}', ${price}, this)">Add</button>`;
+
+    // Remove the item from the order
+    removeFromOrder(name);
+  } else {
+    // Update the order with the new quantity
+    updateOrder(name, quantity, price);
   }
 }
 
 // Function to add an item to the order
-// function addToOrder(name, price) {
-//   const listItem = document.createElement('li');
-//   listItem.textContent = `${name} - ₹${price.toFixed(2)}`;
-//   orderList.appendChild(listItem);
-//   total += price;
-//   totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
-// }
-
-// Function to add an item to the order
-function addToOrder(name, price) {
+function addToOrder(name, quantity, price) {
   const existingItem = Array.from(orderList.children).find(item =>
     item.dataset.name === name
   );
 
   if (existingItem) {
     // Update quantity and total price for the existing item
-    const quantityInput = existingItem.querySelector('.quantity');
+    const quantitySpan = existingItem.querySelector('.order-quantity');
     const amountSpan = existingItem.querySelector('.amount');
 
-    // Increment the quantity
-    quantityInput.value = parseInt(quantityInput.value, 10) + 1;
-
-    // Update the total price for this item
-    const newAmount = quantityInput.value * price;
+    quantitySpan.textContent = quantity;
+    const newAmount = quantity * price;
     amountSpan.textContent = `₹${newAmount.toFixed(2)}`;
   } else {
     // Add a new item to the list
@@ -71,32 +116,46 @@ function addToOrder(name, price) {
 
     listItem.innerHTML = `
       ${name} - 
-      <input class="quantity" type="number" value="1" min="1" style="width: 40px; text-align: center;" onchange="updateItemTotal(this, ${price})"> x ₹${price.toFixed(2)} = 
-      <span class="amount">₹${price.toFixed(2)}</span>
+      <span class="order-quantity">${quantity}</span> x ₹${price.toFixed(2)} = 
+      <span class="amount">₹${(quantity * price).toFixed(2)}</span>
     `;
     orderList.appendChild(listItem);
   }
 
-  // Update the total amount
-  total += price;
-  totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
+  // Recalculate the total amount
+  recalculateTotal();
 }
 
-// Function to update item total and overall total when quantity changes
-function updateItemTotal(input, price) {
-  const quantity = parseInt(input.value, 10);
-  if (quantity < 1) {
-    alert("Quantity cannot be less than 1.");
-    input.value = 1;
-    return;
+// Function to remove an item from the order
+function removeFromOrder(name) {
+  const existingItem = Array.from(orderList.children).find(item =>
+    item.dataset.name === name
+  );
+
+  if (existingItem) {
+    // Remove the item from the order list
+    orderList.removeChild(existingItem);
+
+    // Update the total amount
+    recalculateTotal();
   }
+}
 
-  const listItem = input.closest('li');
-  const amountSpan = listItem.querySelector('.amount');
+// Function to update the order when the quantity changes
+function updateOrder(name, quantity, price) {
+  const existingItem = Array.from(orderList.children).find(item =>
+    item.dataset.name === name
+  );
 
-  // Update the amount for the item
-  const newAmount = quantity * price;
-  amountSpan.textContent = `₹${newAmount.toFixed(2)}`;
+  if (existingItem) {
+    const quantitySpan = existingItem.querySelector('.order-quantity');
+    const amountSpan = existingItem.querySelector('.amount');
+
+    // Update the quantity and the amount
+    quantitySpan.textContent = quantity;
+    const newAmount = quantity * price;
+    amountSpan.textContent = `₹${newAmount.toFixed(2)}`;
+  }
 
   // Recalculate the total amount
   recalculateTotal();
@@ -104,7 +163,7 @@ function updateItemTotal(input, price) {
 
 // Function to recalculate the total amount
 function recalculateTotal() {
-  total = 0;
+  let total = 0;
   const items = orderList.querySelectorAll('li');
   items.forEach(item => {
     const amount = parseFloat(item.querySelector('.amount').textContent.replace('₹', ''));
@@ -112,6 +171,7 @@ function recalculateTotal() {
   });
   totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
 }
+
 
 async function placeOrder() {
   const orderItems = [];
@@ -194,6 +254,7 @@ async function placeOrder() {
       });
       document.getElementById("orderList").innerHTML = "";
       document.getElementById("totalAmount").textContent = "Total: ₹0.00";
+      fetchMenuItems();//This will reset the quantity
     } else {
       const errorData = await response.json();
       Swal.fire({

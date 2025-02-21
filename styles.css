@@ -237,3 +237,53 @@ body {
   padding: 0.4rem 0.8rem !important; /* Smaller button size */
   font-size: 0.85rem !important; /* Smaller font size */
 }
+
+/* Version 1.1 */
+.quantity-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Adds space between buttons and input */
+}
+
+.quantity-button {
+  background-color: #3f9e76; /* Red button */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.quantity-button:hover {
+  background-color: #3f9e76; /* Darker shade on hover */
+}
+
+.quantity-input {
+  width: 50px;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.quantity-input:focus {
+  border-color: #3f9e76; /* Red border on focus */
+  box-shadow: 0 0 4px rgba(121, 226, 126, 0.5); /* Soft red glow */
+}
+
+.quantity-input {
+  -moz-appearance: textfield; /* Firefox */
+  -webkit-appearance: none; /* Safari and Chrome */
+  appearance: none; /* Standard */
+}
+
+.quantity-input::-webkit-inner-spin-button, 
+.quantity-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
